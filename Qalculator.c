@@ -1,29 +1,35 @@
-#include <gtk/gtk.h>
-#include <string.h>
-#include <math.h>
-#define MAXCHAR 10
+#include <gtk/gtk.h> 
+#include <string.h> 
+#include <math.h> 
+#define MAXNUM 10
+#define MAXCHAR 20
 
 typedef struct CalculatorState {
-    char working_number1[MAXCHAR];
-    char working_number2[MAXCHAR];
+    char working_number1[MAXNUM];
+    char working_number2[MAXNUM];
+    char answer_number[MAXNUM];
+    char working_text[MAXCHAR];
     char operator;
     int result_number;
+    GtkWidget *window;
+    GtkWidget *vbox;
     GtkWidget *grid;
+    GtkWidget *label;
 } CalculatorState;
 
 CalculatorState global_state;
 
-static void initialize_values(CalculatorState *state) {
-    state->grid = gtk_grid_new();
+static void initialize_values(GtkApplication *app) {
+    strcpy(global_state.answer_number, "0");
+    strcpy(global_state.working_text, global_state.answer_number);
+    global_state.window = gtk_application_window_new(app);
+    global_state.vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    global_state.grid = gtk_grid_new();
+    global_state.label = gtk_label_new(global_state.working_text);
 }
 
-static void create_vbox(GtkWidget *window) {
-    create_vbox(window); 
-}
-
-static void string_to_int(char *string) {
+static void string_to_int(char *string) { 
     if(strlen(global_state.working_number1) >= MAXCHAR - 1) return;
-
     int number = 0;
     int i = strlen(string) - 1;
     g_print("string:%s\n", global_state.working_number1);
@@ -59,7 +65,6 @@ static void create_calculator_grid(GtkWidget *window) {
     int number_of_buttons = 9;
     GtkWidget *number_buttons[number_of_buttons];
 
-    gtk_window_set_child(GTK_WINDOW(window), global_state.grid);
     gtk_widget_set_halign(global_state.grid, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(global_state.grid, GTK_ALIGN_CENTER);
 
@@ -108,17 +113,23 @@ static void create_operator_grid(GtkWidget *window) {
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
-    GtkWidget *window;
-    initialize_values(&global_state);
+    initialize_values(app);
 
-    window = gtk_application_window_new(app);
-    gtk_window_set_title(GTK_WINDOW(window), "Qalculator");
-    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+    global_state.window = gtk_application_window_new(app);
+    gtk_window_set_title(GTK_WINDOW(global_state.window), "Qalculator");
+    gtk_window_set_default_size(GTK_WINDOW(global_state.window), 500, 500);
 
-    create_calculator_grid(window);
-    create_operator_grid(window);
+    gtk_window_set_child(GTK_WINDOW(global_state.window), global_state.vbox);
+    gtk_widget_set_halign(global_state.vbox, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(global_state.vbox, GTK_ALIGN_CENTER);
 
-    gtk_widget_show(window);
+    create_calculator_grid(global_state.vbox);
+    create_operator_grid(global_state.vbox);
+
+    gtk_box_append(GTK_BOX(global_state.vbox), global_state.label);
+    gtk_box_append(GTK_BOX(global_state.vbox), global_state.grid);
+
+    gtk_widget_show(global_state.window);
 }
 
 int main(int argc, char **argv) {
