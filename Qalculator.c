@@ -1,4 +1,6 @@
+#include "gtk/gtkcssprovider.h"
 #include <gtk/gtk.h> 
+#include <stdio.h>
 #include <string.h> 
 #include <math.h> 
 #define MAXNUM 10
@@ -15,6 +17,7 @@ typedef struct CalculatorState {
     GtkWidget *vbox;
     GtkWidget *grid;
     GtkWidget *label;
+    GtkCssProvider *provider;
 } CalculatorState;
 
 CalculatorState global_state;
@@ -25,7 +28,7 @@ static void initialize_values(GtkApplication *app) {
     global_state.window = gtk_application_window_new(app);
     global_state.vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     global_state.grid = gtk_grid_new();
-    global_state.label = gtk_label_new(global_state.working_text);
+    global_state.label = gtk_label_new("0");
 }
 
 static void string_to_int(char *string) { 
@@ -55,10 +58,6 @@ static void append_to_working_number2(GtkWidget *window, int num_to_append) {
 
     strncat(global_state.working_number2, &char_to_append, 1);
     string_to_int(global_state.working_number2);
-}
-
-static void set_operator(GtkWidget *window, char set_to_operator) {
-    global_state.operator = set_to_operator;
 }
 
 static void create_calculator_grid(GtkWidget *window) {
@@ -92,14 +91,12 @@ static void create_operator_grid(GtkWidget *window) {
     char string_of_operators[number_of_operators];
     strcpy(string_of_operators, "+-*/=.");
 
-    g_print("%s\n", string_of_operators);
     GtkWidget *operator_buttons[number_of_operators];
 
     for(int i = 0; i <= strlen(string_of_operators) - 3; i++) {
         char current_operator[2] = {string_of_operators[i]};
         operator_buttons[i] = gtk_button_new_with_label(current_operator);
         char *thing = &string_of_operators[i];
-        g_print("%s\n", thing);
         gtk_grid_attach(GTK_GRID(global_state.grid), operator_buttons[i], 3, i, 1, 1);
 
         if(i == strlen(string_of_operators) - 3) {
@@ -110,6 +107,12 @@ static void create_operator_grid(GtkWidget *window) {
             }
         }
     }
+}
+
+static void css_set(GtkCssProvider *provider, GtkWidget *widget) {
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
@@ -128,6 +131,11 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     gtk_box_append(GTK_BOX(global_state.vbox), global_state.label);
     gtk_box_append(GTK_BOX(global_state.vbox), global_state.grid);
+
+    // CSS Linking
+    //global_state.provider = gtk_css_provider_new();
+    //gtk_css_provider_load_from_path(global_state.provider, "style.css");
+    //css_set(global_state.provider, global_state.label);
 
     gtk_widget_show(global_state.window);
 }
