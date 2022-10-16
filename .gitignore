@@ -51,5 +51,7 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Cache file not needed in pushes.
-.cache/
+# Custom .gitignore files
+.cache/clangd/index/Qalculator.c.A8C88E7DD4D50DF4.idx
+TODO.txt
+
