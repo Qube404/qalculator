@@ -1,17 +1,20 @@
 #include <gtk/gtk.h> 
 #include <stdio.h>
 #include <string.h> 
+#include <stdlib.h>
 #include <math.h> 
-#define MAXNUM 10
-#define MAXCHAR 20
+#define MAXNUMLEN 5 
+#define MAXNUM 32000
+#define MAXCHAR 5 
 
 typedef struct CalculatorState {
     char *working_number;
-    char number1[MAXNUM];
-    char number2[MAXNUM];
-    char answer_number[MAXNUM];
+    char number1[MAXNUMLEN];
+    char number2[MAXNUMLEN];
+    char answer_number[MAXNUMLEN];
     char working_text[MAXCHAR];
     char operator;
+    int flags;
     int result_number;
     GtkWidget *window;
     GtkWidget *vbox;
@@ -26,6 +29,7 @@ static void initialize_values(GtkApplication *app) {
     global_state.working_number = global_state.number1;
     strcpy(global_state.answer_number, "0");
     strcpy(global_state.working_text, global_state.answer_number);
+    strcpy(&global_state.operator, "\0");
     global_state.window = gtk_application_window_new(app);
     global_state.vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     global_state.grid = gtk_grid_new();
@@ -50,12 +54,9 @@ static int string_to_int(char *string) {
     return number;
 }
 
-static char *int_to_string(GtkWidget *window, int number) {
+static char *int_to_string(GtkWidget *window, int number, int num_len) {
     static char string[20];
     char character;
-
-    for(int i = 0; i <= number; i++) {
-    }
 
     g_print("string: %s\n", string);
     return string;
@@ -69,16 +70,40 @@ static void append_to_working_number(GtkWidget *window, int num_to_append) {
     gtk_label_set_label(GTK_LABEL(global_state.label), global_state.working_number);
     int num_version_of_string = string_to_int(global_state.working_number);
 
-    g_print("number: %d\n", num_version_of_string);
+    g_print("number 1 & 2: %s %s\nresult_number: %d\n\n", global_state.number1, global_state.number2, global_state.result_number);
 }
 
 // Handler for clicking a special button that is not a normal number button.
-static void operator_button_behaviour(GtkWidget *window, char *operator) {
+static void operator_button_behaviour(GtkWidget *window, gpointer *pointer_operator) {
     char operators[6] = "+-*/=.";
+    char operator = GPOINTER_TO_INT(pointer_operator);
+    char string_ver_operator[] = {operator, '\0'};
 
-    if(strcmp(operator, "+") == 0) {
-        // TODO - Continue here, make arithmetic operator behaviour as well as equal
-        // sign and decimal point behaviour.
+    gtk_label_set_label(GTK_LABEL(global_state.label), string_ver_operator);
+    global_state.working_number = global_state.number2;
+
+    if(operator != '=') {
+        global_state.operator = operator;
+    } else {
+        switch(global_state.operator) {
+            case '+':
+                global_state.result_number = string_to_int(global_state.number1) + string_to_int(global_state.number2);
+                break;
+            case '-':
+                global_state.result_number = string_to_int(global_state.number1) - string_to_int(global_state.number2);
+                break;
+            case '*':
+                global_state.result_number = string_to_int(global_state.number1) * string_to_int(global_state.number2);
+                break;
+            case '/':
+                global_state.result_number = string_to_int(global_state.number1) / string_to_int(global_state.number2);
+                break;
+            }
+
+            global_state.working_number = global_state.number1;
+            sprintf(global_state.working_number, "%d", global_state.result_number);
+            strcpy(global_state.number2, "\0"); 
+            gtk_label_set_label(GTK_LABEL(global_state.label), global_state.working_number);
     }
 }
 
@@ -116,8 +141,9 @@ static void create_operator_grid(GtkWidget *window) {
     GtkWidget *operator_buttons[number_of_operators];
 
     for(int i = 0; i <= strlen(string_of_operators) - 3; i++) {
-        char current_operator[2] = {string_of_operators[i]};
+        char current_operator[1] = {string_of_operators[i]};
         operator_buttons[i] = gtk_button_new_with_label(current_operator);
+        g_signal_connect(operator_buttons[i], "clicked", G_CALLBACK(operator_button_behaviour), GINT_TO_POINTER(current_operator[0]));
         char *thing = &string_of_operators[i];
         gtk_grid_attach(GTK_GRID(global_state.grid), operator_buttons[i], 3, i, 1, 1);
 
@@ -125,9 +151,9 @@ static void create_operator_grid(GtkWidget *window) {
             for(int j = 1; j <= 2; j++) {
                 char current_operator[2] = {string_of_operators[i + j]};
                 operator_buttons[i + j] = gtk_button_new_with_label(current_operator);
+                g_signal_connect(operator_buttons[i + j], "clicked", G_CALLBACK(operator_button_behaviour), GINT_TO_POINTER(current_operator[0]));
                 gtk_grid_attach(GTK_GRID(global_state.grid), operator_buttons[i + j], i - j, i, 1, 1);
             }
-        g_signal_connect(operator_buttons[i], "clicked", G_CALLBACK(operator_button_behaviour), current_operator);
         }
     }
 }
