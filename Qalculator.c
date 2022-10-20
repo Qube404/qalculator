@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <math.h> 
 #define MAXNUMLEN 5 
-#define MAXNUM 32000
+#define MAXNUMSTR "32767"
 #define MAXCHAR 5 
 
 typedef struct CalculatorState {
@@ -18,6 +18,7 @@ typedef struct CalculatorState {
     int result_number;
     GtkWidget *window;
     GtkWidget *vbox;
+    GtkWidget *hbox;
     GtkWidget *grid;
     GtkWidget *label;
     GtkCssProvider *provider;
@@ -31,6 +32,7 @@ static void initialize_values(GtkApplication *app) {
     strcpy(global_state.working_text, global_state.answer_number);
     strcpy(&global_state.operator, "\0");
     global_state.window = gtk_application_window_new(app);
+    global_state.hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     global_state.vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     global_state.grid = gtk_grid_new();
     global_state.label = gtk_label_new("0");
@@ -54,21 +56,22 @@ static int string_to_int(char *string) {
     return number;
 }
 
-static char *int_to_string(GtkWidget *window, int number, int num_len) {
-    static char string[20];
-    char character;
-
-    g_print("string: %s\n", string);
-    return string;
-}
-
 // Behaviour for clicking button of type number.
 static void append_to_working_number(GtkWidget *window, int num_to_append) {
     char char_to_append = num_to_append + '0';
+    char *temp_string = global_state.working_number;
 
-    strncat(global_state.working_number, &char_to_append, 1);
+    strncat(temp_string, &char_to_append, 1);
+    if(strlen(temp_string) >= strlen(MAXNUMSTR)) {
+        for(int i = 0; i <= strlen(temp_string); i++) {
+            if(string_to_int(&temp_string[i]) >= string_to_int(&MAXNUMSTR[i])) {
+                return;
+            }
+        }
+    } 
+
+    global_state.working_number = temp_string;
     gtk_label_set_label(GTK_LABEL(global_state.label), global_state.working_number);
-    int num_version_of_string = string_to_int(global_state.working_number);
 
     g_print("number 1 & 2: %s %s\nresult_number: %d\n\n", global_state.number1, global_state.number2, global_state.result_number);
 }
@@ -98,6 +101,8 @@ static void operator_button_behaviour(GtkWidget *window, gpointer *pointer_opera
             case '/':
                 global_state.result_number = string_to_int(global_state.number1) / string_to_int(global_state.number2);
                 break;
+            default:
+                return;
             }
 
             global_state.working_number = global_state.number1;
@@ -107,7 +112,54 @@ static void operator_button_behaviour(GtkWidget *window, gpointer *pointer_opera
     }
 }
 
-static void create_calculator_grid(GtkWidget *window) {
+static void special_button_behaviour(GtkWidget *window, gpointer *pointer_operator) {
+    char operator = GPOINTER_TO_INT(pointer_operator);
+    char string_ver_operator[] = {operator, '\0'};
+
+    switch(operator) {
+        case 'C':
+                gtk_label_set_label(GTK_LABEL(global_state.label), "0");
+                strcpy(global_state.number1, "\0");
+                strcpy(global_state.number2, "\0");
+                strcpy(global_state.working_number, "\0");
+                strcpy(global_state.working_text, "0");
+                strcpy(global_state.answer_number, "0");
+                global_state.result_number = 0;
+                break;
+        case 'X':
+                int last_char = strlen(global_state.working_number); 
+                global_state.working_number[last_char - 1] = '\0';
+
+                if(last_char <= 1) {
+                    gtk_label_set_label(GTK_LABEL(global_state.label), "0");
+                } else {
+                    gtk_label_set_label(GTK_LABEL(global_state.label), global_state.working_number);
+                }
+                break;
+        default:
+            return;
+    }
+}
+
+static void create_special_buttons() {
+    int number_of_buttons = 2;
+    GtkWidget *number_buttons[number_of_buttons];
+    char *labels[] = {"C", "X"};
+
+    number_buttons[0] = gtk_button_new_with_label(labels[0]);
+    number_buttons[1] = gtk_button_new_with_label(labels[1]);
+
+    gtk_widget_set_halign(global_state.hbox, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(global_state.hbox, GTK_ALIGN_CENTER);
+
+    g_signal_connect(number_buttons[0], "clicked", G_CALLBACK(special_button_behaviour), GINT_TO_POINTER(labels[0][0]));
+    g_signal_connect(number_buttons[1], "clicked", G_CALLBACK(special_button_behaviour), GINT_TO_POINTER(labels[1][0]));
+
+    gtk_box_append(GTK_BOX(global_state.hbox), number_buttons[0]);
+    gtk_box_append(GTK_BOX(global_state.hbox), number_buttons[1]);
+}
+
+static void create_calculator_grid() {
     int number_of_buttons = 9;
     GtkWidget *number_buttons[number_of_buttons];
 
@@ -133,7 +185,7 @@ static void create_calculator_grid(GtkWidget *window) {
     }
 } 
 
-static void create_operator_grid(GtkWidget *window) {
+static void create_operator_grid() {
     int number_of_operators = 6;
     char string_of_operators[number_of_operators];
     strcpy(string_of_operators, "+-*/=.");
@@ -174,9 +226,11 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_widget_set_halign(global_state.vbox, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(global_state.vbox, GTK_ALIGN_CENTER);
 
-    create_calculator_grid(global_state.vbox);
-    create_operator_grid(global_state.vbox);
+    create_special_buttons();
+    create_calculator_grid();
+    create_operator_grid();
 
+    gtk_box_append(GTK_BOX(global_state.vbox), global_state.hbox);
     gtk_box_append(GTK_BOX(global_state.vbox), global_state.label);
     gtk_box_append(GTK_BOX(global_state.vbox), global_state.grid);
 
