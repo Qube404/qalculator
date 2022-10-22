@@ -52,6 +52,7 @@ Mkfile.old
 dkms.conf
 
 # Custom .gitignore files
-.cache/clangd/index/Qalculator.c.A8C88E7DD4D50DF4.idx
+.cache/
 TODO.txt
+Qalculator
 
