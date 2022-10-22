@@ -3,14 +3,14 @@
 #include <string.h> 
 #include <stdlib.h>
 #include <math.h> 
+
 #define MAXNUMLEN 5 
 #define MAXNUMSTR "32767"
 #define MAXCHAR 5 
 
 typedef struct CalculatorState {
-    char *working_number;
-    char number1[MAXNUMLEN];
-    char number2[MAXNUMLEN];
+    int working_number;
+    char numbers[2][MAXNUMLEN];
     char answer_number[MAXNUMLEN];
     char working_text[MAXCHAR];
     char operator;
@@ -27,7 +27,7 @@ typedef struct CalculatorState {
 CalculatorState global_state;
 
 static void initialize_values(GtkApplication *app) {
-    global_state.working_number = global_state.number1;
+    global_state.working_number = 0;
     strcpy(global_state.answer_number, "0");
     strcpy(global_state.working_text, global_state.answer_number);
     strcpy(&global_state.operator, "\0");
@@ -41,7 +41,7 @@ static void initialize_values(GtkApplication *app) {
 static int string_to_int(char *string) { 
     char *copy_of_string = string;
 
-    if(strlen(global_state.number1) >= MAXCHAR - 1) return -1;
+    if(strlen(global_state.numbers[0]) >= MAXCHAR - 1) return -1;
     int number = 0;
     int i = strlen(copy_of_string) - 1;
     int j = 0;
@@ -59,9 +59,9 @@ static int string_to_int(char *string) {
 // Behaviour for clicking button of type number.
 static void append_to_working_number(GtkWidget *window, int num_to_append) {
     char char_to_append = num_to_append + '0';
-    char *temp_string = global_state.working_number;
+    g_print("value: %s\n", global_state.numbers[global_state.working_number]);
+    char *temp_string = global_state.numbers[global_state.working_number];
 
-    strncat(temp_string, &char_to_append, 1);
     if(strlen(temp_string) >= strlen(MAXNUMSTR)) {
         for(int i = 0; i <= strlen(temp_string); i++) {
             if(string_to_int(&temp_string[i]) >= string_to_int(&MAXNUMSTR[i])) {
@@ -69,11 +69,12 @@ static void append_to_working_number(GtkWidget *window, int num_to_append) {
             }
         }
     } 
+    strncat(temp_string, &char_to_append, 1);
 
-    global_state.working_number = temp_string;
-    gtk_label_set_label(GTK_LABEL(global_state.label), global_state.working_number);
+    strcpy(global_state.numbers[global_state.working_number], temp_string);
+    gtk_label_set_label(GTK_LABEL(global_state.label), global_state.numbers[global_state.working_number]);
 
-    g_print("number 1 & 2: %s %s\nresult_number: %d\n\n", global_state.number1, global_state.number2, global_state.result_number);
+    g_print("number 1 & 2: %s %s\nresult_number: %d\nworking_number: %s\n\n", global_state.numbers[0], global_state.numbers[1], global_state.result_number, global_state.numbers[global_state.working_number]);
 }
 
 // Handler for clicking a special button that is not a normal number button.
@@ -83,33 +84,35 @@ static void operator_button_behaviour(GtkWidget *window, gpointer *pointer_opera
     char string_ver_operator[] = {operator, '\0'};
 
     gtk_label_set_label(GTK_LABEL(global_state.label), string_ver_operator);
-    global_state.working_number = global_state.number2;
+    global_state.working_number = 1;
 
     if(operator != '=') {
         global_state.operator = operator;
     } else {
         switch(global_state.operator) {
             case '+':
-                global_state.result_number = string_to_int(global_state.number1) + string_to_int(global_state.number2);
+                global_state.result_number = string_to_int(global_state.numbers[0]) + string_to_int(global_state.numbers[1]);
                 break;
             case '-':
-                global_state.result_number = string_to_int(global_state.number1) - string_to_int(global_state.number2);
+                global_state.result_number = string_to_int(global_state.numbers[0]) - string_to_int(global_state.numbers[1]);
                 break;
             case '*':
-                global_state.result_number = string_to_int(global_state.number1) * string_to_int(global_state.number2);
+                global_state.result_number = string_to_int(global_state.numbers[0]) * string_to_int(global_state.numbers[1]);
                 break;
             case '/':
-                global_state.result_number = string_to_int(global_state.number1) / string_to_int(global_state.number2);
+                global_state.result_number = string_to_int(global_state.numbers[0]) / string_to_int(global_state.numbers[1]);
                 break;
             default:
                 return;
             }
 
-            global_state.working_number = global_state.number1;
-            sprintf(global_state.working_number, "%d", global_state.result_number);
-            strcpy(global_state.number2, "\0"); 
-            gtk_label_set_label(GTK_LABEL(global_state.label), global_state.working_number);
+            global_state.working_number = 0;
+            sprintf(global_state.numbers[global_state.working_number], "%d", global_state.result_number);
+            gtk_label_set_label(GTK_LABEL(global_state.label), global_state.numbers[global_state.working_number]);
+            global_state.working_number = 1;
+            strcpy(global_state.numbers[global_state.working_number], "\0");
     }
+    g_print("number 1 & 2: %s %s\nresult_number: %d\nworking_number: %s\n\n", global_state.numbers[0], global_state.numbers[1], global_state.result_number, global_state.numbers[global_state.working_number]);
 }
 
 static void special_button_behaviour(GtkWidget *window, gpointer *pointer_operator) {
@@ -119,21 +122,21 @@ static void special_button_behaviour(GtkWidget *window, gpointer *pointer_operat
     switch(operator) {
         case 'C':
                 gtk_label_set_label(GTK_LABEL(global_state.label), "0");
-                strcpy(global_state.number1, "\0");
-                strcpy(global_state.number2, "\0");
-                strcpy(global_state.working_number, "\0");
+                global_state.working_number = 0;
+                strcpy(global_state.numbers[0], "\0");
+                strcpy(global_state.numbers[1], "\0");
                 strcpy(global_state.working_text, "0");
                 strcpy(global_state.answer_number, "0");
                 global_state.result_number = 0;
                 break;
         case 'X':
-                int last_char = strlen(global_state.working_number); 
-                global_state.working_number[last_char - 1] = '\0';
+                int last_char = strlen(global_state.numbers[global_state.working_number]) - 1; 
+                global_state.numbers[global_state.working_number][last_char] = '\0';
 
-                if(last_char <= 1) {
+                if(last_char <= 0) {
                     gtk_label_set_label(GTK_LABEL(global_state.label), "0");
                 } else {
-                    gtk_label_set_label(GTK_LABEL(global_state.label), global_state.working_number);
+                    gtk_label_set_label(GTK_LABEL(global_state.label), global_state.numbers[global_state.working_number]);
                 }
                 break;
         default:
@@ -236,7 +239,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     // CSS Linking
     global_state.provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_path(global_state.provider, "style.css");
+    gtk_css_provider_load_from_path(global_state.provider, "/home/qube/Coding/Qalculator/style.css");
     css_set(global_state.provider, global_state.label);
 
     gtk_window_present(GTK_WINDOW(global_state.window));
