@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="QalculatorWindow" parent="GtkApplicationWindow">
+        <property name="title">Qalculator</property> 
+        <property name="default-height">640</property> 
+        <property name="default-width">480</property> 
+
+        <child>
+            <object class="GtkButton">
+                <property name="label">Test</property>
+            </object>
+        </child>
+    </template>
+</interface>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+    <gresource prefix="/com/github/Qube404/">
+        <file compressed="true" preprocess="xml-stripblanks">qalculator_window.ui</file>
+    </gresource>
+</gresources>

@@ -2,7 +2,14 @@
 name = "qalculator"
 version = "0.1.0"
 edition = "2021"
+authors = ["Qube Thwomp"]
+description = "A simple GUI Calculator written in Rust."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+calc-lib = { path = "/home/qube/Coding/calc-lib/" }
+gtk = { version = "0.6.6", package = "gtk4" }
+
+[build-dependencies]
+glib-build-tools = "0.17.0"
