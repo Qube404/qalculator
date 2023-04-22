@@ -2,8 +2,9 @@
 <interface>
     <template class="QalculatorWindow" parent="GtkApplicationWindow">
         <property name="title">Qalculator</property> 
-        <property name="default-height">198</property> 
-        <property name="default-width">172</property> 
+        <property name="default-height">400</property> 
+        <property name="default-width">400</property> 
+        <property name="resizable">false</property> 
 
         <child>
             <object class="GtkBox">
@@ -24,6 +25,8 @@
                         <child type="label">
                             <object class="GtkLabel" id="label">
                                 <property name="label">0</property>
+                                <property name="margin-bottom">20</property>
+                                <property name="margin-top">20</property>
                             </object>
                         </child>
                     </object>
@@ -35,6 +38,8 @@
                             <object class="GtkButton" id="button1">
                                 <signal name="clicked" handler="append_num_to_expression" swapped="true"/>
                                 <property name="label">1</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">0</property>
@@ -47,6 +52,8 @@
                             <object class="GtkButton" id="button2">
                                 <signal name="clicked" handler="append_num_to_expression" swapped="true"/>
                                 <property name="label">2</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">1</property>
@@ -59,6 +66,8 @@
                             <object class="GtkButton" id="button3">
                                 <signal name="clicked" handler="append_num_to_expression" swapped="true"/>
                                 <property name="label">3</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">2</property>
@@ -71,6 +80,8 @@
                             <object class="GtkButton" id="button_plus">
                                 <signal name="clicked" handler="append_op_to_expression" swapped="true"/>
                                 <property name="label">+</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">3</property>
@@ -83,6 +94,8 @@
                             <object class="GtkButton" id="button4">
                                 <signal name="clicked" handler="append_num_to_expression" swapped="true"/>
                                 <property name="label">4</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">0</property>
@@ -95,6 +108,8 @@
                             <object class="GtkButton" id="button5">
                                 <signal name="clicked" handler="append_num_to_expression" swapped="true"/>
                                 <property name="label">5</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">1</property>
@@ -107,6 +122,8 @@
                             <object class="GtkButton" id="button6">
                                 <signal name="clicked" handler="append_num_to_expression" swapped="true"/>
                                 <property name="label">6</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">2</property>
@@ -119,6 +136,8 @@
                             <object class="GtkButton" id="button_minus">
                                 <signal name="clicked" handler="append_op_to_expression" swapped="true"/>
                                 <property name="label">-</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">3</property>
@@ -131,6 +150,8 @@
                             <object class="GtkButton" id="button7">
                                 <signal name="clicked" handler="append_num_to_expression" swapped="true"/>
                                 <property name="label">7</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">0</property>
@@ -143,6 +164,8 @@
                             <object class="GtkButton" id="button8">
                                 <signal name="clicked" handler="append_num_to_expression" swapped="true"/>
                                 <property name="label">8</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">1</property>
@@ -155,6 +178,8 @@
                             <object class="GtkButton" id="button9">
                                 <signal name="clicked" handler="append_num_to_expression" swapped="true"/>
                                 <property name="label">9</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">2</property>
@@ -167,6 +192,8 @@
                             <object class="GtkButton" id="button_multiply">
                                 <signal name="clicked" handler="append_op_to_expression" swapped="true"/>
                                 <property name="label">*</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">3</property>
@@ -179,6 +206,8 @@
                             <object class="GtkButton" id="button0">
                                 <signal name="clicked" handler="append_num_to_expression" swapped="true"/>
                                 <property name="label">0</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">0</property>
@@ -191,6 +220,8 @@
                             <object class="GtkButton" id="button_clear">
                                 <signal name="clicked" handler="clear_expression" swapped="true"/>
                                 <property name="label">C</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">1</property>
@@ -203,6 +234,8 @@
                             <object class="GtkButton" id="button_evaluate">
                                 <signal name="clicked" handler="evaluate_expression" swapped="true"/>
                                 <property name="label">=</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">2</property>
@@ -215,6 +248,8 @@
                             <object class="GtkButton" id="button_divide">
                                 <signal name="clicked" handler="append_op_to_expression" swapped="true"/>
                                 <property name="label">/</property>
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
 
                                 <layout>
                                     <property name="column">3</property>
