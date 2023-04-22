@@ -35,5 +35,8 @@ fn load_css() {
 
 fn activate(app: &Application) {
     let window = QalculatorWindow::new(app);
+    window.set_title(Some("Qalculator"));
+    window.set_default_size(200, 200);
+    window.set_resizable(false);
     window.present();
 }
