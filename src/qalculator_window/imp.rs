@@ -73,11 +73,6 @@ impl ObjectSubclass for QalculatorWindow {
 
 #[gtk::template_callbacks]
 impl QalculatorWindow {
-    // 1. Button is clicked
-    // 2. Append value of button to expression string
-    // 2a. Do this by adding a property named value to custom button
-    // with a getter and using that.
-    // 3. Set symbol string to the buttons value.
     #[template_callback]
     fn append_num_to_expression(&self, button: &Button) {
         // Take value of the current expression.
@@ -112,6 +107,8 @@ impl QalculatorWindow {
         self
             .label
             .set_property("label", current_num);
+
+        self.print_values();
     }
 
     #[template_callback]
@@ -148,6 +145,8 @@ impl QalculatorWindow {
         self
             .label
             .set_property("label", button_value);
+
+        self.print_values();
     }
 
     #[template_callback]
@@ -167,6 +166,8 @@ impl QalculatorWindow {
         self
             .current_op
             .set("".to_string());
+
+        self.print_values();
     }
 
     #[template_callback]
@@ -203,6 +204,8 @@ impl QalculatorWindow {
         self
             .label
             .set_property("label", equ_result);
+
+        self.print_values();
     }
 
     fn print_values(&self) {
@@ -216,7 +219,7 @@ impl QalculatorWindow {
             .current_op
             .take();
 
-        println!("{}, {}, {}", expression, num, op);
+        println!("Expression: {}\nNumber: {}\nOperator: {}", expression, num, op);
 
         self
             .expression
